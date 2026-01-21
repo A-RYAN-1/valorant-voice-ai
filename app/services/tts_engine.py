@@ -9,5 +9,6 @@ class TTSEngine:
         self.tts.tts_to_file(
             text=text,
             speaker_wav=str(SAGE_VOICE_PATH),
+            language="en",
             file_path=output_path
         )

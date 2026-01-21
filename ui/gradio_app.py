@@ -1,10 +1,23 @@
-from fastapi import FastAPI
-from app.api.generate import router
+import gradio as gr
+import requests
 
-app = FastAPI(title="Valorant Voice AI")
+API_URL = "http://127.0.0.1:8000/generate"
 
-app.include_router(router)
+def generate_voice(text):
+    response = requests.post(
+        API_URL,
+        params={"text": text}
+    )
 
-@app.get("/")
-def health_check():
-    return {"status": "running"}
+    if response.status_code != 200:
+        return None
+
+    data = response.json()
+    return data["audio_path"]
+
+gr.Interface(
+    fn=generate_voice,
+    inputs=gr.Textbox(lines=2, placeholder="Enter dialogue..."),
+    outputs=gr.Audio(type="filepath"),
+    title="Sage Voice Generator"
+).launch()
