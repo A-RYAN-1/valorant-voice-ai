@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+torch
+torchaudio
+TTS
+numpy
+scipy
+soundfile
+gradio
