@@ -1,9 +1,0 @@
-fastapi
-uvicorn
-torch
-torchaudio
-TTS==0.22.0
-numpy
-scipy
-soundfile
-gradio

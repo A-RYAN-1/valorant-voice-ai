@@ -1,17 +1,16 @@
-# Python
 __pycache__/
 *.pyc
+.venv/
+.env
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
 
-# Virtual environment
-venv/
-
-# Runtime outputs
+# Local-only: the user's own extracted game audio, trained weights and generated audio.
+# Nothing under these folders is ever committed or hosted (see the README, Legal).
+data/
+models/
 outputs/
+checkpoints/
 
-# Pyenv
-.python-version
-
-# OS
 .DS_Store
-
-models/**/*.wav

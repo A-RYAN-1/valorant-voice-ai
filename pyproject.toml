@@ -1,0 +1,31 @@
+[project]
+name = "valorant-voice-ai"
+version = "0.1.0"
+description = "Text to speech in Valorant agent voices: dataset pipeline, XTTS-v2 fine-tune, measured evaluation and a small API"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "numpy",
+  "scipy",
+  "soundfile",
+  "fastapi",
+  "uvicorn",
+]
+
+[project.optional-dependencies]
+# Torch is installed separately with the CUDA build for your GPU, see the README.
+tts = ["coqui-tts[codec]>=0.27"]
+data = ["faster-whisper"]
+evaluate = ["speechbrain", "faster-whisper"]
+dev = ["pytest", "httpx", "ruff"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 110
+
+[tool.setuptools.packages.find]
+include = ["valorant_voice*"]
+
+[tool.setuptools.package-data]
+valorant_voice = ["serve/static/*"]
