@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Valorant Voice AI</title>
+  <style>
+    :root {
+      --bg: #f6f6f4; --surface: #ffffff; --border: #dcdcd6; --text: #1c1c1a; --muted: #66665f;
+      --accent: #c8323f; --accent-text: #ffffff; --danger: #b3261e; --radius: 10px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #101112; --surface: #18191b; --border: #2b2d30; --text: #ecece8; --muted: #9a9a92;
+        --accent: #ef5a67; --accent-text: #20080b; --danger: #f2766d;
+      }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    main { max-width: 560px; margin: 0 auto; padding: 40px 16px; }
+    h1 { margin: 0; font-size: 24px; letter-spacing: -0.01em; }
+    .lead { margin: 4px 0 24px; color: var(--muted); }
+    form { display: grid; gap: 16px; padding: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+    label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; }
+    select, textarea { font: inherit; color: inherit; padding: 10px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; }
+    textarea { min-height: 110px; resize: vertical; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .count { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+    button { min-height: 42px; padding: 0 18px; font: inherit; font-weight: 600; color: var(--accent-text); background: var(--accent); border: 0; border-radius: 6px; cursor: pointer; }
+    button:disabled { opacity: 0.55; cursor: not-allowed; }
+    audio { width: 100%; margin-top: 4px; }
+    #message { min-height: 22px; font-size: 14px; color: var(--muted); }
+    #message.error { color: var(--danger); }
+    footer { margin-top: 20px; font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Valorant Voice AI</h1>
+    <p class="lead">Type a line, pick an agent, hear it in that agent's voice.</p>
+
+    <form id="form">
+      <label>Agent
+        <select id="agent" required></select>
+      </label>
+      <label>Text
+        <textarea id="text" maxlength="300" required placeholder="Rotate B, I will hold the smoke."></textarea>
+      </label>
+      <div class="row">
+        <span class="count" id="count">0 / 300</span>
+        <button type="submit" id="submit">Speak</button>
+      </div>
+      <p id="message" role="status"></p>
+      <audio id="player" controls hidden></audio>
+    </form>
+
+    <footer>Unofficial fan project, not affiliated with Riot Games. Generated audio is labelled AI generated.</footer>
+  </main>
+
+  <script>
+    const agent = document.getElementById("agent");
+    const text = document.getElementById("text");
+    const count = document.getElementById("count");
+    const message = document.getElementById("message");
+    const submit = document.getElementById("submit");
+    const player = document.getElementById("player");
+    const limit = Number(text.maxLength);
+
+    const say = (value, isError = false) => {
+      message.textContent = value;
+      message.className = isError ? "error" : "";
+    };
+
+    fetch("/v1/agents")
+      .then((response) => response.json())
+      .then((agents) => {
+        for (const entry of agents) {
+          const option = new Option(entry.ready ? entry.name : `${entry.name} (no voice data)`, entry.id);
+          option.disabled = !entry.ready;
+          agent.add(option);
+        }
+        const first = [...agent.options].find((option) => !option.disabled);
+        if (first) agent.value = first.value;
+        else say("No agent has voice data loaded yet. See the README, Data.", true);
+      })
+      .catch(() => say("Cannot reach the server.", true));
+
+    text.addEventListener("input", () => { count.textContent = `${text.value.length} / ${limit}`; });
+
+    document.getElementById("form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      submit.disabled = true;
+      say("Generating...");
+      try {
+        const response = await fetch("/v1/speak", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ agent: agent.value, text: text.value }),
+        });
+        if (!response.ok) {
+          const body = await response.json().catch(() => ({}));
+          throw new Error(typeof body.detail === "string" ? body.detail : "The request was rejected.");
+        }
+        if (player.src) URL.revokeObjectURL(player.src);
+        player.src = URL.createObjectURL(await response.blob());
+        player.hidden = false;
+        await player.play().catch(() => {});
+        say("");
+      } catch (error) {
+        say(error.message, true);
+      } finally {
+        submit.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
