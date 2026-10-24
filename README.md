@@ -96,6 +96,10 @@ without the fine-tune.
 
 **Stack:** Python 3.12, PyTorch, coqui-tts (XTTS-v2), faster-whisper, speechbrain (ECAPA-TDNN), FastAPI.
 
+## Results so far
+
+**Dataset (measured 2026-10-24, Kaggle):** 12,164 lines fetched for 26 agents; 2,611 lines (148 minutes) kept after the length filter (1.5 to 12 s), repeat removal and the Whisper text check; 2,346 train, 125 val, 140 test. Per-agent table and the length histogram: [docs/dataset-audit.md](docs/dataset-audit.md). Model results follow in the next features.
+
 ## Legal and ethics
 
 The voice lines are Riot Games' copyright and the performances belong to the voice actors. This is an
