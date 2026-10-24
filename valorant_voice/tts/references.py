@@ -8,18 +8,20 @@ import soundfile as sf
 from .. import config
 from ..data.manifest import read_transcripts
 from ..data.split import assign_split
+from ..data.text import text_key
 
 REFERENCES_PER_AGENT = 3
-MIN_REFERENCE_SECONDS = 6.0
+MIN_REFERENCE_SECONDS = 3.0
 MAX_REFERENCE_SECONDS = 12.0
+TARGET_REFERENCE_SECONDS = 6.0
 
 
 def choose_references(clips: list[tuple[str, float]], count: int = REFERENCES_PER_AGENT) -> list[str]:
-    """From (clip_id, seconds) pairs, takes the `count` clips closest to 9 s inside the 6 to 12 s window.
+    """From (clip_id, seconds) pairs, takes the `count` clips closest to 6 s inside the 3 to 12 s window.
 
     Only train-split clips are passed in, so a test line is never the voice sample for itself.
     """
-    usable = [(abs(seconds - 9.0), clip_id) for clip_id, seconds in clips
+    usable = [(abs(seconds - TARGET_REFERENCE_SECONDS), clip_id) for clip_id, seconds in clips
               if MIN_REFERENCE_SECONDS <= seconds <= MAX_REFERENCE_SECONDS]
     return [clip_id for _, clip_id in sorted(usable)[:count]]
 
@@ -28,8 +30,8 @@ def build_references(agent: str, clean_dir: Path = config.CLEAN_DIR, out_dir: Pa
     """Copies the chosen clips to reference/<agent>/. Returns their ids (empty when none qualify)."""
     folder = clean_dir / agent
     candidates = []
-    for clip_id, _ in read_transcripts(folder):
-        if assign_split(f"{agent}/{clip_id}") != "train":
+    for clip_id, text in read_transcripts(folder):
+        if assign_split(text_key(text)) != "train":
             continue
         info = sf.info(folder / f"{clip_id}.wav")
         candidates.append((clip_id, info.duration))
