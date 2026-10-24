@@ -1,0 +1,169 @@
+{
+  "date": "2026-10-24",
+  "label": "xtts-v2-zero-shot",
+  "checkpoint": "base xtts_v2",
+  "manifest_sha1": "f0bc66eaca756b4e2d9c609c0a00b28229781015",
+  "agents": {
+    "astra": {
+      "lines": 4,
+      "speaker_similarity": 0.3636,
+      "word_error_rate": 0.2332,
+      "real_time_factor": 5.91
+    },
+    "breach": {
+      "lines": 3,
+      "speaker_similarity": 0.3302,
+      "word_error_rate": 0.0,
+      "real_time_factor": 0.472
+    },
+    "brimstone": {
+      "lines": 3,
+      "speaker_similarity": 0.5117,
+      "word_error_rate": 0.081,
+      "real_time_factor": 0.47
+    },
+    "chamber": {
+      "lines": 5,
+      "speaker_similarity": 0.4962,
+      "word_error_rate": 0.1,
+      "real_time_factor": 0.459
+    },
+    "clove": {
+      "lines": 5,
+      "speaker_similarity": 0.4061,
+      "word_error_rate": 0.1995,
+      "real_time_factor": 0.459
+    },
+    "cypher": {
+      "lines": 5,
+      "speaker_similarity": 0.4756,
+      "word_error_rate": 0.0,
+      "real_time_factor": 0.454
+    },
+    "deadlock": {
+      "lines": 5,
+      "speaker_similarity": 0.4043,
+      "word_error_rate": 0.0444,
+      "real_time_factor": 0.463
+    },
+    "fade": {
+      "lines": 5,
+      "speaker_similarity": 0.2441,
+      "word_error_rate": 0.0,
+      "real_time_factor": 0.467
+    },
+    "gekko": {
+      "lines": 4,
+      "speaker_similarity": 0.2518,
+      "word_error_rate": 0.1061,
+      "real_time_factor": 0.461
+    },
+    "harbor": {
+      "lines": 5,
+      "speaker_similarity": 0.3398,
+      "word_error_rate": 0.0714,
+      "real_time_factor": 0.458
+    },
+    "iso": {
+      "lines": 3,
+      "speaker_similarity": 0.5416,
+      "word_error_rate": 0.0,
+      "real_time_factor": 0.465
+    },
+    "jett": {
+      "lines": 5,
+      "speaker_similarity": 0.3562,
+      "word_error_rate": 0.1328,
+      "real_time_factor": 0.465
+    },
+    "kayo": {
+      "lines": 5,
+      "speaker_similarity": 0.474,
+      "word_error_rate": 0.065,
+      "real_time_factor": 0.456
+    },
+    "killjoy": {
+      "lines": 5,
+      "speaker_similarity": 0.4511,
+      "word_error_rate": 0.06,
+      "real_time_factor": 0.448
+    },
+    "neon": {
+      "lines": 5,
+      "speaker_similarity": 0.4408,
+      "word_error_rate": 0.14,
+      "real_time_factor": 0.457
+    },
+    "omen": {
+      "lines": 5,
+      "speaker_similarity": 0.4552,
+      "word_error_rate": 0.0733,
+      "real_time_factor": 0.478
+    },
+    "phoenix": {
+      "lines": 5,
+      "speaker_similarity": 0.2778,
+      "word_error_rate": 0.0949,
+      "real_time_factor": 0.45
+    },
+    "raze": {
+      "lines": 5,
+      "speaker_similarity": 0.355,
+      "word_error_rate": 0.0843,
+      "real_time_factor": 0.447
+    },
+    "reyna": {
+      "lines": 4,
+      "speaker_similarity": 0.5056,
+      "word_error_rate": 0.0417,
+      "real_time_factor": 0.454
+    },
+    "sage": {
+      "lines": 5,
+      "speaker_similarity": 0.3666,
+      "word_error_rate": 0.0,
+      "real_time_factor": 0.452
+    },
+    "skye": {
+      "lines": 5,
+      "speaker_similarity": 0.3767,
+      "word_error_rate": 0.0,
+      "real_time_factor": 0.455
+    },
+    "sova": {
+      "lines": 5,
+      "speaker_similarity": 0.3558,
+      "word_error_rate": 0.105,
+      "real_time_factor": 0.448
+    },
+    "tejo": {
+      "lines": 4,
+      "speaker_similarity": 0.4318,
+      "word_error_rate": 0.108,
+      "real_time_factor": 0.455
+    },
+    "viper": {
+      "lines": 2,
+      "speaker_similarity": 0.2825,
+      "word_error_rate": 0.0455,
+      "real_time_factor": 0.474
+    },
+    "vyse": {
+      "lines": 5,
+      "speaker_similarity": 0.4701,
+      "word_error_rate": 0.0875,
+      "real_time_factor": 0.451
+    },
+    "yoru": {
+      "lines": 5,
+      "speaker_similarity": 0.4532,
+      "word_error_rate": 0.0,
+      "real_time_factor": 0.458
+    }
+  },
+  "mean": {
+    "speaker_similarity": 0.4007,
+    "word_error_rate": 0.0721,
+    "real_time_factor": 0.6687
+  }
+}
