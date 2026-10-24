@@ -57,7 +57,8 @@ def test_ingest_agent_writes_clean_clips_and_counts_outcomes(tmp_path):
 
     outcome = ingest.ingest_agent("sage", raw_dir=raw, clean_dir=clean)
 
-    assert outcome == {"kept": 1, "too_short": 1, "unreadable": 1}
+    assert {k: outcome[k] for k in ("kept", "too_short", "unreadable")} == {"kept": 1, "too_short": 1, "unreadable": 1}
+    assert outcome["len_under_0.5s"] == 1 and outcome["len_under_6s"] == 1
     written, rate = sf.read(clean / "sage" / "good.wav")
     assert rate == config.SAMPLE_RATE and written.ndim == 1
 

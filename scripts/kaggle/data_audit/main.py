@@ -22,7 +22,7 @@ log = []
 
 
 def run(name, command, cwd=None, env=None):
-    result = subprocess.run(command, cwd=cwd, env=env, capture_output=True, text=True)
+    result = subprocess.run(command, check=False, cwd=cwd, env=env, capture_output=True, text=True)
     tail = (result.stdout + result.stderr)[-3000:]
     log.append(f"## {name} (exit {result.returncode})\n{tail}\n")
     print(f"{name}: exit {result.returncode}", flush=True)
@@ -47,7 +47,7 @@ def main():
     (OUT / "log.md").write_text("\n".join(log), encoding="utf-8")
     manifests = DATA / "manifests"
     if manifests.exists():
-        counts = {p.stem: max(0, sum(1 for _ in open(p, encoding="utf-8")) - 1) for p in manifests.glob("*.csv")}
+        counts = {p.stem: len(p.read_text(encoding="utf-8").splitlines()) - 1 for p in manifests.glob("*.csv")}
         (OUT / "manifest_counts.json").write_text(json.dumps(counts), encoding="utf-8")
 
 

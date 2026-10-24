@@ -103,3 +103,21 @@ def test_audit_counts_minutes_drops_and_splits(tmp_path):
     assert row_["train"] + row_["val"] + row_["test"] == 2
     table = stats.audit_table(tmp_path)
     assert "| sage | 5 | 2 | 1.0 |" in table and "**total**" in table
+
+
+def test_length_bucket_names_the_range_a_clip_falls_in():
+    from valorant_voice.data.ingest import length_bucket
+
+    assert length_bucket(0.3) == "len_under_0.5s"
+    assert length_bucket(1.2) == "len_under_1.5s"
+    assert length_bucket(30) == "len_over_12s"
+
+
+def test_whisper_input_is_mono_16k_float(tmp_path):
+    from valorant_voice.data.transcribe import WHISPER_RATE, whisper_input
+
+    sf.write(tmp_path / "a.wav", np.zeros((48000, 2), dtype="float32"), 48000)
+
+    samples = whisper_input(tmp_path / "a.wav")
+
+    assert samples.ndim == 1 and abs(len(samples) - WHISPER_RATE) <= 1

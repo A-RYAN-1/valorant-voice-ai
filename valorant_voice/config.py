@@ -31,7 +31,7 @@ RATE_LIMIT_PER_MINUTE = int(os.environ.get("VV_RATE_LIMIT_PER_MINUTE", "20"))
 
 # Dataset rules.
 SAMPLE_RATE = 22050  # the rate XTTS-v2 expects for training audio
-MIN_SECONDS = 1.5
+MIN_SECONDS = float(os.environ.get("VV_MIN_SECONDS", "1.5"))
 MAX_SECONDS = 12.0
 SPLIT_SEED = int(os.environ.get("VV_SPLIT_SEED", "13"))
 VAL_FRACTION = 0.05
