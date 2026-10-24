@@ -5,15 +5,36 @@ GPU. Copy `data/clean/` and `data/manifests/` to the session, run this file, the
 folder back and point VV_CHECKPOINT_DIR at it. The validation manifest is used for monitoring; the
 test manifest is never read here.
 
-    python -m valorant_voice.train.finetune --epochs 6 --batch-size 3 --grad-accum 84
+    python -m valorant_voice.train.finetune --epochs 6 --batch-size 3 --grad-accum 5
+
+The result is exported to <output>/model, a folder VV_CHECKPOINT_DIR can point at.
 """
 
 import argparse
+import shutil
 from pathlib import Path
 
 from .. import config
 
 PROJECT = "valorant-voice-ai"
+
+
+BASE_FILES = ("vocab.json", "mel_stats.pth", "dvae.pth")
+
+
+def export_checkpoint(run_dir: Path, base: Path, target: Path) -> Path:
+    """Builds the folder XttsEngine loads: the newest trained weights plus the base model's support files."""
+    weights = sorted(run_dir.rglob("*.pth"), key=lambda p: p.stat().st_mtime)
+    weights = [p for p in weights if p.name in ("best_model.pth",) or p.name.startswith("checkpoint_")]
+    if not weights:
+        raise FileNotFoundError(f"No trained weights under {run_dir}")
+    target.mkdir(parents=True, exist_ok=True)
+    shutil.copy(weights[-1], target / "model.pth")
+    shutil.copy(base / "config.json", target / "config.json")
+    for name in BASE_FILES:
+        if (base / name).exists():
+            shutil.copy(base / name, target / name)
+    return target
 
 
 def finetune(epochs: int, batch_size: int, grad_accum: int, learning_rate: float, output: Path) -> Path:
@@ -72,7 +93,7 @@ def finetune(epochs: int, batch_size: int, grad_accum: int, learning_rate: float
         optimizer_params={"betas": [0.9, 0.96], "eps": 1e-8, "weight_decay": 1e-2},
         lr=learning_rate,
         lr_scheduler="MultiStepLR",
-        lr_scheduler_params={"milestones": [50000 * 18, 150000 * 18, 300000 * 18], "gamma": 0.5, "last_epoch": -1},
+        lr_scheduler_params={"milestones": [50000 * 18, 150000 * 18, 300000 * 18], "gamma": 0.5, "last_epoch": -1},  # far beyond this run: constant rate
         epochs=epochs,
         test_sentences=[],
     )
@@ -86,18 +107,18 @@ def finetune(epochs: int, batch_size: int, grad_accum: int, learning_rate: float
         eval_samples=eval_samples,
     )
     trainer.fit()
-    return output
+    return export_checkpoint(output, base, output / "model")
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--epochs", type=int, default=6)
     parser.add_argument("--batch-size", type=int, default=3)
-    parser.add_argument("--grad-accum", type=int, default=84, help="effective batch = batch-size * grad-accum")
+    parser.add_argument("--grad-accum", type=int, default=5, help="effective batch = batch-size * grad-accum")
     parser.add_argument("--lr", type=float, default=5e-6)
     parser.add_argument("--output", type=Path, default=config.ROOT / "checkpoints")
     args = parser.parse_args()
-    print("checkpoint folder:", finetune(args.epochs, args.batch_size, args.grad_accum, args.lr, args.output))
+    print("exported model folder:", finetune(args.epochs, args.batch_size, args.grad_accum, args.lr, args.output))
 
 
 if __name__ == "__main__":

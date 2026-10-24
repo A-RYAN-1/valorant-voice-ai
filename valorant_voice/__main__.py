@@ -95,7 +95,7 @@ def _speak(args):
 def _evaluate(args):
     from .evaluation.run import run_evaluation
 
-    print(run_evaluation(lines_per_agent=args.lines))
+    print(run_evaluation(lines_per_agent=args.lines, label=args.label))
 
 
 def _serve(args):
@@ -133,9 +133,9 @@ def main(argv=None):
     speak = add("speak", _speak, "synthesize one line to outputs/")
     speak.add_argument("agent")
     speak.add_argument("text")
-    add("evaluate", _evaluate, "measure similarity, WER and speed on the test lines").add_argument(
-        "--lines", type=int, default=10
-    )
+    evaluate = add("evaluate", _evaluate, "measure similarity, WER and speed on the test lines")
+    evaluate.add_argument("--lines", type=int, default=10)
+    evaluate.add_argument("--label", default="", help="name in the result file; default is the checkpoint folder")
     serve = add("serve", _serve, "run the API and the web page")
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8000)
