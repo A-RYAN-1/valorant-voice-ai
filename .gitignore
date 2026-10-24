@@ -8,9 +8,9 @@ __pycache__/
 
 # Local-only: the user's own extracted game audio, trained weights and generated audio.
 # Nothing under these folders is ever committed or hosted (see the README, Legal).
-data/
-models/
-outputs/
-checkpoints/
+/data/
+/models/
+/outputs/
+/checkpoints/
 
 .DS_Store
