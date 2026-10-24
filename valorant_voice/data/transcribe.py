@@ -4,14 +4,24 @@ import csv
 from collections import Counter
 from pathlib import Path
 
+import soundfile as sf
+
 from .. import config
 from ..agents import require_agent
 from ..evaluation.metrics import word_error_rate
+from . import audio
 
 MIN_LANGUAGE_PROBABILITY = 0.8
 MIN_AVG_LOGPROB = -1.0
 SEPARATOR = "|"
 MAX_VERIFY_WER = 0.3
+WHISPER_RATE = 16000
+
+
+def whisper_input(path: Path):
+    """Decodes with soundfile so faster-whisper never needs its own (version-sensitive) decoder."""
+    samples, rate = sf.read(path, dtype="float32")
+    return audio.resample(audio.to_mono(samples), rate, WHISPER_RATE)
 
 
 def normalise_text(text: str) -> str:
@@ -36,7 +46,7 @@ def transcribe_agent(agent: str, model_size: str = "small.en", clean_dir: Path =
     folder = clean_dir / agent
     kept = []
     for path in sorted(folder.glob("*.wav")):
-        segments, info = model.transcribe(str(path), beam_size=5, language="en")
+        segments, info = model.transcribe(whisper_input(path), beam_size=5, language="en")
         segments = list(segments)
         if not segments:
             continue
@@ -66,7 +76,7 @@ def verify_agent(agent: str, model_size: str = "small.en", clean_dir: Path = con
     outcome = Counter()
     kept = []
     for clip_id, text in rows:
-        segments, _ = model.transcribe(str(path.parent / f"{clip_id}.wav"), beam_size=5, language="en")
+        segments, _ = model.transcribe(whisper_input(path.parent / f"{clip_id}.wav"), beam_size=5, language="en")
         heard = " ".join(segment.text for segment in segments)
         if matches_audio(text, heard):
             kept.append((clip_id, text))
