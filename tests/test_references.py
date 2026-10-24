@@ -49,3 +49,11 @@ def test_export_checkpoint_copies_newest_weights_and_base_files(tmp_path):
 
     assert (folder / "model.pth").read_text() == "new"
     assert {p.name for p in folder.iterdir()} == {"model.pth", "config.json", "vocab.json", "mel_stats.pth", "dvae.pth"}
+
+
+def test_support_file_prefers_the_base_folder(tmp_path):
+    from valorant_voice.train.finetune import support_file
+
+    (tmp_path / "dvae.pth").write_text("x")
+
+    assert support_file(tmp_path, "dvae.pth") == str(tmp_path / "dvae.pth")
