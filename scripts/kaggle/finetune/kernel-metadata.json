@@ -1,0 +1,10 @@
+{
+  "id": "aryan111deshmukh/vv-finetune",
+  "title": "vv finetune",
+  "code_file": "main.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true
+}

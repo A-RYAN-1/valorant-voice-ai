@@ -28,3 +28,24 @@ def test_build_references_only_uses_train_split_lines(tmp_path):
 
     assert len(chosen) == 3
     assert all(assign_split(text_key(f"Line number {c[1:]}")) == "train" for c in chosen)
+
+
+def test_export_checkpoint_copies_newest_weights_and_base_files(tmp_path):
+    import os
+
+    from valorant_voice.train.finetune import export_checkpoint
+
+    base, run = tmp_path / "base", tmp_path / "run" / "xtts-agents-1"
+    base.mkdir()
+    run.mkdir(parents=True)
+    for name in ("config.json", "vocab.json", "mel_stats.pth", "dvae.pth"):
+        (base / name).write_text(name)
+    old, new = run / "checkpoint_100.pth", run / "best_model.pth"
+    old.write_text("old")
+    new.write_text("new")
+    os.utime(old, (1, 1))
+
+    folder = export_checkpoint(tmp_path / "run", base, tmp_path / "out")
+
+    assert (folder / "model.pth").read_text() == "new"
+    assert {p.name for p in folder.iterdir()} == {"model.pth", "config.json", "vocab.json", "mel_stats.pth", "dvae.pth"}
