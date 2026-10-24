@@ -96,8 +96,9 @@ def finetune(epochs: int, batch_size: int, grad_accum: int, learning_rate: float
         lr_scheduler_params={"milestones": [50000 * 18, 150000 * 18, 300000 * 18], "gamma": 0.5, "last_epoch": -1},  # far beyond this run: constant rate
         epochs=epochs,
         test_sentences=[],
+        datasets=[dataset],
     )
-    train_samples, eval_samples = load_tts_samples([dataset], eval_split=False)
+    train_samples, eval_samples = load_tts_samples(train_config, eval_split=True)  # coqui-tts 0.28 reads config.datasets
     trainer = Trainer(
         TrainerArgs(restore_path=None, skip_train_epoch=False, start_with_eval=True, grad_accum_steps=grad_accum),
         train_config,
