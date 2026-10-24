@@ -14,7 +14,7 @@ dependencies = [
 [project.optional-dependencies]
 # Torch is installed separately with the CUDA build for your GPU, see the README.
 tts = ["coqui-tts[codec]>=0.27"]
-data = ["faster-whisper"]
+data = ["faster-whisper", "huggingface_hub", "pyarrow"]
 evaluate = ["speechbrain", "faster-whisper"]
 dev = ["pytest", "httpx", "ruff"]
 

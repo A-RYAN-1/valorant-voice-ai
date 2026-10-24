@@ -13,11 +13,50 @@ def _agents_from(args) -> list[str]:
     return [slug for slug in AGENTS if (config.RAW_DIR / slug).is_dir()]
 
 
+def _fetch(args):
+    from .data.fetch import NO_PUBLIC_DATA, fetch_agent
+    from .data.stats import record
+
+    for agent in [require_agent(args.agent)] if args.agent else [a for a in AGENTS if a not in NO_PUBLIC_DATA]:
+        count = fetch_agent(agent)
+        record(config.CLEAN_DIR / agent, "fetch", {"fetched": count})
+        print(agent, "fetched:", count)
+
+
 def _ingest(args):
     from .data.ingest import ingest_agent
+    from .data.stats import record
 
     for agent in _agents_from(args):
-        print(agent, dict(ingest_agent(agent)))
+        outcome = ingest_agent(agent)
+        record(config.CLEAN_DIR / agent, "ingest", outcome)
+        print(agent, dict(outcome))
+
+
+def _prepare(args):
+    from .data.prepare import prepare_agent
+    from .data.stats import record
+
+    for agent in _agents_from(args):
+        outcome = prepare_agent(agent)
+        record(config.CLEAN_DIR / agent, "prepare", outcome)
+        print(agent, dict(outcome))
+
+
+def _verify(args):
+    from .data.stats import record
+    from .data.transcribe import verify_agent
+
+    for agent in _agents_from(args):
+        outcome = verify_agent(agent, model_size=args.model)
+        record(config.CLEAN_DIR / agent, "verify", outcome)
+        print(agent, dict(outcome))
+
+
+def _audit(_args):
+    from .data.stats import audit_table
+
+    print(audit_table())
 
 
 def _transcribe(args):
@@ -79,7 +118,13 @@ def main(argv=None):
         sub.set_defaults(handler=handler)
         return sub
 
+    add("fetch", _fetch, "download voice lines from the public Hugging Face dataset into data/raw", agent=True)
     add("ingest", _ingest, "clean raw clips into data/clean", agent=True)
+    add("prepare", _prepare, "pair clean clips with the source text, drop empty and repeated lines", agent=True)
+    add("verify", _verify, "keep lines whose text Whisper hears in the clip", agent=True).add_argument(
+        "--model", default="small.en"
+    )
+    add("audit", _audit, "print the per-agent table of lines kept, minutes and drops")
     add("transcribe", _transcribe, "Whisper transcripts for clean clips", agent=True).add_argument(
         "--model", default="small.en"
     )

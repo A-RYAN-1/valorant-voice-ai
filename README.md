@@ -55,10 +55,13 @@ machine with audio you extracted from your own copy of the game.
 
 - **Agent list is fixed**: the 29 playable agents. There is no upload of arbitrary reference audio, so
   the service cannot be used to clone a real person.
-- **Dataset pipeline**: resample to 22.05 kHz mono, trim silence, normalise loudness, drop clips outside
-  1.5 to 12 seconds, transcribe with Whisper, keep only clear English lines.
-- **Leak-free split**: a clip's train, validation or test assignment is a hash of its id, so test lines are
-  never trained on and never move when more data is added.
+- **Dataset pipeline**: downloads the public voice-line dataset of 26 agents on Kaggle, resamples to
+  22.05 kHz mono, trims silence, normalises loudness, drops clips outside 1.5 to 12 seconds, drops empty
+  and repeated lines, and keeps only lines whose text Whisper hears in the clip. A per-agent audit table
+  shows what was kept and dropped, and why.
+- **Leak-free split**: a line's train, validation or test assignment is a hash of its text, so test lines
+  are never trained on, a repeated line such as "Okay." never sits in both train and test, and nothing
+  moves when more data is added.
 - **API**: typed JSON request, text length cap, per-client rate limit, every response labelled
   `X-Generated-Audio: ai`.
 - **Evaluation harness**: speaker similarity (ECAPA-TDNN cosine), word error rate (Whisper hears the
@@ -73,10 +76,13 @@ model and the data it came from.
 ## How it works
 
 ```
-your extracted lines   data/raw/<agent>/*.wav            (local only, never committed)
+Hugging Face dataset   NgThVinh/ValorantAgentVoiceLines  (fetched on Kaggle, never committed)
+  -> fetch             wav and source text per agent      python -m valorant_voice fetch
   -> ingest            clean 22.05 kHz mono clips         python -m valorant_voice ingest
-  -> transcribe        Whisper, English lines only        python -m valorant_voice transcribe
-  -> manifests         train / val / test, hashed split   python -m valorant_voice manifests
+  -> prepare           pair with text, drop repeats       python -m valorant_voice prepare
+  -> verify            keep lines Whisper hears           python -m valorant_voice verify
+  -> manifests         train / val / test, text-hash split  python -m valorant_voice manifests
+  -> audit             kept, minutes and drops per agent  python -m valorant_voice audit
   -> references        3 voice samples per agent          python -m valorant_voice references
   -> fine-tune         XTTS-v2 on all agents (GPU)        valorant_voice/train/finetune.py
   -> evaluate          vs the zero-shot baseline          python -m valorant_voice evaluate
@@ -96,7 +102,9 @@ The voice lines are Riot Games' copyright and the performances belong to the voi
 unofficial, non-commercial fan and learning project, not affiliated with Riot Games. The rules it follows:
 
 1. **No game audio and no trained weights are ever committed or hosted.** `data/`, `models/` and
-   `outputs/` are git-ignored. You supply your own extraction from your own installed game.
+   `outputs/` are git-ignored. The voice lines come from the public Hugging Face dataset
+   `NgThVinh/ValorantAgentVoiceLines`, downloaded at run time on Kaggle. Its card declares no licence and
+   the audio is Riot's, so a public copy is not permission: nothing here redistributes it.
 2. **No public demo.**
 3. **Fixed list of fictional characters.** Nothing accepts an uploaded voice.
 4. **Output is labelled** with the `X-Generated-Audio: ai` header and a footer on the page.
@@ -128,14 +136,17 @@ pip install -e ".[tts,data,evaluate,dev]"
 pytest                             # no game audio needed
 ```
 
-**Your data.** Extract voice lines from your own installed game (for example with a community asset
-viewer), convert them to WAV, and put them in `data/raw/<agent>/`, where `<agent>` is the id from
-`python -m valorant_voice speak --help`'s agent list (`sage`, `jett`, `kayo`, ...). Then:
+**The data.** The dataset covers 26 of the 29 agents (Miks, Veto and Waylay are not in it). The steps
+below download about 2 GB, so run them on a Kaggle notebook or a machine you do not mind filling; a
+single agent is `--agent sage`.
 
 ```bash
+python -m valorant_voice fetch
 python -m valorant_voice ingest
-python -m valorant_voice transcribe
+python -m valorant_voice prepare
+python -m valorant_voice verify
 python -m valorant_voice manifests
+python -m valorant_voice audit
 python -m valorant_voice references
 python -m valorant_voice speak sage "Healing up, stay close."   # writes outputs/sage.wav
 python -m valorant_voice serve                                  # http://127.0.0.1:8000
