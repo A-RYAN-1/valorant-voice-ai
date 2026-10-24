@@ -20,6 +20,17 @@ PROJECT = "valorant-voice-ai"
 
 
 BASE_FILES = ("vocab.json", "mel_stats.pth", "dvae.pth")
+SUPPORT_REPO = "coqui/XTTS-v2"  # the model download omits the DVAE and mel statistics the trainer needs
+
+
+def support_file(base: Path, name: str) -> str:
+    """Path of a trainer support file: next to the base model when present, otherwise downloaded."""
+    if (base / name).exists():
+        return str(base / name)
+    from huggingface_hub import hf_hub_download
+
+    return hf_hub_download(SUPPORT_REPO, name, local_dir=config.MODEL_DIR / "xtts-support")
+
 
 
 def export_checkpoint(run_dir: Path, base: Path, target: Path) -> Path:
@@ -61,8 +72,8 @@ def finetune(epochs: int, batch_size: int, grad_accum: int, learning_rate: float
         min_conditioning_length=66150,  # 3 s
         max_wav_length=255995,  # about 11.6 s
         max_text_length=200,
-        mel_norm_file=str(base / "mel_stats.pth"),
-        dvae_checkpoint=str(base / "dvae.pth"),
+        mel_norm_file=support_file(base, "mel_stats.pth"),
+        dvae_checkpoint=support_file(base, "dvae.pth"),
         xtts_checkpoint=str(base / "model.pth"),
         tokenizer_file=str(base / "vocab.json"),
         gpt_num_audio_tokens=1026,
