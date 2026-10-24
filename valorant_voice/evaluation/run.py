@@ -54,8 +54,11 @@ def run_evaluation(lines_per_agent: int = 10, engine=None, label: str = "") -> P
     engine = engine or XttsEngine()
     embed = _embedder()
     whisper = WhisperModel("small.en", device=config.DEVICE or "auto")
+    test_rows = _test_rows(lines_per_agent)
+    first_agent, first_rows = next(iter(test_rows.items()))
+    engine.synthesize(first_agent, first_rows[0]["text"])  # warm-up: loads the model, so it is not timed
     per_agent = {}
-    for agent, rows in _test_rows(lines_per_agent).items():
+    for agent, rows in test_rows.items():
         similarity, wer, speed = [], [], []
         for row in rows:
             started = time.perf_counter()
