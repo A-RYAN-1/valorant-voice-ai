@@ -108,8 +108,11 @@ without the fine-tune.
 | Zero-shot XTTS-v2 | 0.401 | 0.073 | 0.46 |
 | Pooled fine-tune, 6 epochs | 0.427 | 0.111 | 0.48 |
 | Pooled fine-tune, 2 epochs | 0.408 | 0.084 | 0.48 |
+| Pooled, 3 epochs, lr 1e-6 | 0.403 | 0.127 | 0.50 |
+| Pooled, 3 epochs, lr 2e-6 | 0.405 | 0.092 | 0.51 |
+| Pooled, 2 epochs, lr 1e-6 | 0.400 | 0.097 | 0.51 |
 
-Similarity rose on 14 of 26 agents (+0.026 overall) but word error rate got worse on 16 of 26 (0.073 to 0.111), so this run does not beat the baseline on the agreed rule (similarity up, error rate not worse). The per-agent test sets hold only 2 to 5 lines, so single-agent differences are noise. The 2-epoch run (same day, `results/2026-11-06-xtts-v2-pooled-finetune-2-epochs.json`) moves less: similarity +0.007, word error rate +0.011, so more training trades accuracy for similarity and neither run beats the baseline. Next: a lower learning rate, and a Sage-only fine-tune.
+Similarity rose on 14 of 26 agents (+0.026 overall) but word error rate got worse on 16 of 26 (0.073 to 0.111), so this run does not beat the baseline on the agreed rule (similarity up, error rate not worse). The per-agent test sets hold only 2 to 5 lines, so single-agent differences are noise. The 2-epoch run (same day, `results/2026-11-06-xtts-v2-pooled-finetune-2-epochs.json`) moves less: similarity +0.007, word error rate +0.011, so more training trades accuracy for similarity and neither run beats the baseline. A sweep of three lower-learning-rate runs (same day, one Kaggle session) gives similarity 0.400 to 0.405, no gain over 0.401, and word error rate 0.092 to 0.127, all above the baseline 0.073. Five pooled fine-tunes in total, none better than zero-shot cloning on these 117 lines; word error rate moves by 0.03 between runs with the same data, so differences of that size are noise at this test-set size. Next: a Sage-only fine-tune and a larger test set.
 
 ## Legal and ethics
 
