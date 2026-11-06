@@ -21,7 +21,7 @@ DATA = TMP / "data"
 DEPENDENCIES = ["soundfile", "scipy", "faster-whisper", "huggingface_hub", "pyarrow", "speechbrain", "coqui-tts[codec]>=0.27"]
 LINES_PER_AGENT = "5"
 CHECKPOINTS = TMP / "checkpoints"
-TRAIN_ARGUMENTS = ["--epochs", "6", "--batch-size", "3", "--grad-accum", "5", "--output", str(CHECKPOINTS)]
+TRAIN_ARGUMENTS = ["--epochs", "2", "--batch-size", "3", "--grad-accum", "5", "--output", str(CHECKPOINTS)]
 
 log = []
 
@@ -53,7 +53,7 @@ def main():
         if train.returncode == 0:
             tuned = {**env, "VV_CHECKPOINT_DIR": str(CHECKPOINTS / "model")}
             run("evaluate", [sys.executable, "-m", "valorant_voice", "evaluate", "--lines", LINES_PER_AGENT,
-                             "--label", "xtts-v2-pooled-finetune"], cwd=CODE, env=tuned)
+                             "--label", "xtts-v2-pooled-finetune-2-epochs"], cwd=CODE, env=tuned)
     stats = OUT / "stats"
     stats.mkdir(exist_ok=True)
     for path in (DATA / "clean").glob("*/stats.json"):
