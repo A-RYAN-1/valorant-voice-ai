@@ -101,6 +101,15 @@ without the fine-tune.
 **Dataset (measured 2026-10-24, Kaggle):** 12,164 lines fetched for 26 agents; 2,611 lines (148 minutes) kept after the length filter (1.5 to 12 s), repeat removal and the Whisper text check; 2,346 train, 125 val, 140 test. Per-agent table and the length histogram: [docs/dataset-audit.md](docs/dataset-audit.md). 
 **Zero-shot XTTS-v2 baseline (measured 2026-10-24, Kaggle T4, `results/2026-10-24-xtts-v2-zero-shot.json`):** over 26 agents and 2 to 5 held-out test lines each (117 lines): speaker similarity 0.401 (ECAPA-TDNN cosine, higher is better), word error rate 0.072 (lower is better), real-time factor 0.67 mean and 0.46 typical (the mean includes the model load on the first line, 5.9 for astra; the harness now times after a warm-up). This is the row every fine-tune has to beat.
 
+**Pooled multi-speaker fine-tune, first run (measured 2026-11-06, Kaggle, `results/2026-11-06-xtts-v2-pooled-finetune.json`):** 6 epochs on the 2,346 train lines (batch 3 x accumulation 5, learning rate 5e-6, 3,910 steps), evaluated on the same 117 lines:
+
+| Model | Speaker similarity (higher) | Word error rate (lower) | Real-time factor (typical) |
+|---|---|---|---|
+| Zero-shot XTTS-v2 | 0.401 | 0.073 | 0.46 |
+| Pooled fine-tune | 0.427 | 0.111 | 0.48 |
+
+Similarity rose on 14 of 26 agents (+0.026 overall) but word error rate got worse on 16 of 26 (0.073 to 0.111), so this run does not beat the baseline on the agreed rule (similarity up, error rate not worse). The per-agent test sets hold only 2 to 5 lines, so single-agent differences are noise. Next: a Sage-only fine-tune and a lower learning rate or fewer epochs.
+
 ## Legal and ethics
 
 The voice lines are Riot Games' copyright and the performances belong to the voice actors. This is an

@@ -1,0 +1,169 @@
+{
+  "date": "2026-11-06",
+  "label": "xtts-v2-pooled-finetune",
+  "checkpoint": "/kaggle/tmp/checkpoints/model",
+  "manifest_sha1": "f0bc66eaca756b4e2d9c609c0a00b28229781015",
+  "agents": {
+    "astra": {
+      "lines": 4,
+      "speaker_similarity": 0.3644,
+      "word_error_rate": 0.2825,
+      "real_time_factor": 0.472
+    },
+    "breach": {
+      "lines": 3,
+      "speaker_similarity": 0.3583,
+      "word_error_rate": 0.0,
+      "real_time_factor": 0.487
+    },
+    "brimstone": {
+      "lines": 3,
+      "speaker_similarity": 0.4672,
+      "word_error_rate": 0.0476,
+      "real_time_factor": 0.489
+    },
+    "chamber": {
+      "lines": 5,
+      "speaker_similarity": 0.4935,
+      "word_error_rate": 0.02,
+      "real_time_factor": 0.475
+    },
+    "clove": {
+      "lines": 5,
+      "speaker_similarity": 0.3863,
+      "word_error_rate": 0.2038,
+      "real_time_factor": 0.483
+    },
+    "cypher": {
+      "lines": 5,
+      "speaker_similarity": 0.5433,
+      "word_error_rate": 0.065,
+      "real_time_factor": 0.48
+    },
+    "deadlock": {
+      "lines": 5,
+      "speaker_similarity": 0.4038,
+      "word_error_rate": 0.3111,
+      "real_time_factor": 0.477
+    },
+    "fade": {
+      "lines": 5,
+      "speaker_similarity": 0.3585,
+      "word_error_rate": 0.0,
+      "real_time_factor": 0.475
+    },
+    "gekko": {
+      "lines": 4,
+      "speaker_similarity": 0.346,
+      "word_error_rate": 0.1625,
+      "real_time_factor": 0.49
+    },
+    "harbor": {
+      "lines": 5,
+      "speaker_similarity": 0.3746,
+      "word_error_rate": 0.1571,
+      "real_time_factor": 0.487
+    },
+    "iso": {
+      "lines": 3,
+      "speaker_similarity": 0.5112,
+      "word_error_rate": 0.0556,
+      "real_time_factor": 0.504
+    },
+    "jett": {
+      "lines": 5,
+      "speaker_similarity": 0.3428,
+      "word_error_rate": 0.2467,
+      "real_time_factor": 0.48
+    },
+    "kayo": {
+      "lines": 5,
+      "speaker_similarity": 0.4322,
+      "word_error_rate": 0.1617,
+      "real_time_factor": 0.473
+    },
+    "killjoy": {
+      "lines": 5,
+      "speaker_similarity": 0.4207,
+      "word_error_rate": 0.1082,
+      "real_time_factor": 0.476
+    },
+    "neon": {
+      "lines": 5,
+      "speaker_similarity": 0.4165,
+      "word_error_rate": 0.0862,
+      "real_time_factor": 0.461
+    },
+    "omen": {
+      "lines": 5,
+      "speaker_similarity": 0.4392,
+      "word_error_rate": 0.0,
+      "real_time_factor": 0.471
+    },
+    "phoenix": {
+      "lines": 5,
+      "speaker_similarity": 0.2725,
+      "word_error_rate": 0.0684,
+      "real_time_factor": 0.465
+    },
+    "raze": {
+      "lines": 5,
+      "speaker_similarity": 0.4889,
+      "word_error_rate": 0.1525,
+      "real_time_factor": 0.47
+    },
+    "reyna": {
+      "lines": 4,
+      "speaker_similarity": 0.5393,
+      "word_error_rate": 0.1302,
+      "real_time_factor": 0.483
+    },
+    "sage": {
+      "lines": 5,
+      "speaker_similarity": 0.4333,
+      "word_error_rate": 0.0667,
+      "real_time_factor": 0.474
+    },
+    "skye": {
+      "lines": 5,
+      "speaker_similarity": 0.5224,
+      "word_error_rate": 0.0857,
+      "real_time_factor": 0.461
+    },
+    "sova": {
+      "lines": 5,
+      "speaker_similarity": 0.4381,
+      "word_error_rate": 0.1042,
+      "real_time_factor": 0.457
+    },
+    "tejo": {
+      "lines": 4,
+      "speaker_similarity": 0.3373,
+      "word_error_rate": 0.125,
+      "real_time_factor": 0.466
+    },
+    "viper": {
+      "lines": 2,
+      "speaker_similarity": 0.4576,
+      "word_error_rate": 0.1818,
+      "real_time_factor": 0.462
+    },
+    "vyse": {
+      "lines": 5,
+      "speaker_similarity": 0.4877,
+      "word_error_rate": 0.075,
+      "real_time_factor": 0.463
+    },
+    "yoru": {
+      "lines": 5,
+      "speaker_similarity": 0.4932,
+      "word_error_rate": 0.0,
+      "real_time_factor": 0.476
+    }
+  },
+  "mean": {
+    "speaker_similarity": 0.428,
+    "word_error_rate": 0.1114,
+    "real_time_factor": 0.4753
+  }
+}
