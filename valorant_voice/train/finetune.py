@@ -15,6 +15,7 @@ import shutil
 from pathlib import Path
 
 from .. import config
+from ..data.manifest import filter_manifest
 
 PROJECT = "valorant-voice-ai"
 
@@ -48,7 +49,8 @@ def export_checkpoint(run_dir: Path, base: Path, target: Path) -> Path:
     return target
 
 
-def finetune(epochs: int, batch_size: int, grad_accum: int, learning_rate: float, output: Path) -> Path:
+def finetune(epochs: int, batch_size: int, grad_accum: int, learning_rate: float, output: Path,
+             agents: list[str] | None = None) -> Path:
     from trainer import Trainer, TrainerArgs
     from TTS.config.shared_configs import BaseDatasetConfig
     from TTS.tts.configs.xtts_config import XttsAudioConfig
@@ -59,12 +61,18 @@ def finetune(epochs: int, batch_size: int, grad_accum: int, learning_rate: float
     from ..tts.engine import BASE_MODEL
 
     base = Path(ModelManager().download_model(BASE_MODEL)[1]).parent
+    train_manifest, val_manifest = config.MANIFEST_DIR / "train.csv", config.MANIFEST_DIR / "val.csv"
+    if agents:  # a single-agent or small-group run trains on those agents' rows only
+        train_manifest, val_manifest = (output / "manifests" / name for name in ("train.csv", "val.csv"))
+        for name, target in (("train.csv", train_manifest), ("val.csv", val_manifest)):
+            if filter_manifest(config.MANIFEST_DIR / name, target, agents) == 0:
+                raise ValueError(f"No {name} rows for agents {agents}")
     dataset = BaseDatasetConfig(
         formatter="coqui",
         dataset_name="valorant-agents",
         path=str(config.CLEAN_DIR),
-        meta_file_train=str(config.MANIFEST_DIR / "train.csv"),
-        meta_file_val=str(config.MANIFEST_DIR / "val.csv"),
+        meta_file_train=str(train_manifest),
+        meta_file_val=str(val_manifest),
         language="en",
     )
     model_args = GPTArgs(
@@ -129,8 +137,10 @@ def main():
     parser.add_argument("--grad-accum", type=int, default=5, help="effective batch = batch-size * grad-accum")
     parser.add_argument("--lr", type=float, default=5e-6)
     parser.add_argument("--output", type=Path, default=config.ROOT / "checkpoints")
+    parser.add_argument("--agents", help="comma-separated agent ids to train on; default is every agent")
     args = parser.parse_args()
-    print("exported model folder:", finetune(args.epochs, args.batch_size, args.grad_accum, args.lr, args.output))
+    print("exported model folder:", finetune(args.epochs, args.batch_size, args.grad_accum, args.lr, args.output,
+                                           args.agents.split(",") if args.agents else None))
 
 
 if __name__ == "__main__":

@@ -24,12 +24,12 @@ from . import metrics
 RESULTS_DIR = config.ROOT / "results"
 
 
-def _test_rows(lines_per_agent: int):
+def _test_rows(lines_per_agent: int, agents: list[str] | None = None):
     by_agent = defaultdict(list)
     with open(config.MANIFEST_DIR / "test.csv", encoding="utf-8", newline="") as handle:
         for row in csv.DictReader(handle, delimiter=SEPARATOR):
             by_agent[row["speaker_name"]].append(row)
-    return {agent: sorted(rows, key=lambda r: r["audio_file"])[:lines_per_agent] for agent, rows in by_agent.items()}
+    return {agent: sorted(rows, key=lambda r: r["audio_file"])[:lines_per_agent] for agent, rows in by_agent.items() if not agents or agent in agents}
 
 
 def _embedder():
@@ -48,13 +48,13 @@ def _embedder():
     return embed
 
 
-def run_evaluation(lines_per_agent: int = 10, engine=None, label: str = "") -> Path:
+def run_evaluation(lines_per_agent: int = 10, engine=None, label: str = "", agents: list[str] | None = None) -> Path:
     from faster_whisper import WhisperModel
 
     engine = engine or XttsEngine()
     embed = _embedder()
     whisper = WhisperModel("small.en", device=config.DEVICE or "auto")
-    test_rows = _test_rows(lines_per_agent)
+    test_rows = _test_rows(lines_per_agent, agents)
     first_agent, first_rows = next(iter(test_rows.items()))
     engine.synthesize(first_agent, first_rows[0]["text"])  # warm-up: loads the model, so it is not timed
     per_agent = {}
