@@ -22,6 +22,19 @@ def read_transcripts(agent_dir: Path):
         return [(row[0], row[1]) for row in csv.reader(handle, delimiter=SEPARATOR) if len(row) == 2]
 
 
+def filter_manifest(source: Path, target: Path, agents: list[str]) -> int:
+    """Writes the rows of `source` that belong to `agents` to `target`. Returns how many rows were kept."""
+    with open(source, encoding="utf-8", newline="") as handle:
+        rows = [row for row in csv.reader(handle, delimiter=SEPARATOR)][1:]
+    kept = [row for row in rows if row[2] in agents]
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with open(target, "w", encoding="utf-8", newline="") as handle:
+        writer = csv.writer(handle, delimiter=SEPARATOR)
+        writer.writerow(HEADER)
+        writer.writerows(kept)
+    return len(kept)
+
+
 def build_manifests(clean_dir: Path = config.CLEAN_DIR, out_dir: Path = config.MANIFEST_DIR) -> Counter:
     """Writes train.csv, val.csv and test.csv. Returns the number of lines per split."""
     out_dir.mkdir(parents=True, exist_ok=True)

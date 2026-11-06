@@ -95,3 +95,15 @@ def test_build_manifests_never_puts_a_clip_in_two_splits(tmp_path):
         assert rows[0] == "audio_file|text|speaker_name"
         seen += [row.split("|")[0] for row in rows[1:]]
     assert len(seen) == len(set(seen)) == 600
+
+
+def test_filter_manifest_keeps_only_the_named_agents(tmp_path):
+    source = tmp_path / "train.csv"
+    header = "audio_file|text|speaker_name"
+    source.write_text(f"{header}\nsage/a.wav|One|sage\njett/b.wav|Two|jett\nsage/c.wav|Three|sage\n", encoding="utf-8")
+
+    kept = manifest.filter_manifest(source, tmp_path / "out" / "train.csv", ["sage"])
+
+    assert kept == 2
+    rows = (tmp_path / "out" / "train.csv").read_text(encoding="utf-8").splitlines()
+    assert rows == [header, "sage/a.wav|One|sage", "sage/c.wav|Three|sage"]
