@@ -38,7 +38,8 @@ def main():
     TMP.mkdir(parents=True, exist_ok=True)
     run("clone", ["git", "clone", "--depth", "1", REPO, str(CODE)])
     run("install", [sys.executable, "-m", "pip", "install", "-q", *DEPENDENCIES])
-    env = {**os.environ, "PYTHONPATH": str(CODE), "VV_DATA_DIR": str(DATA), "VV_DEVICE": "cuda", "COQUI_TOS_AGREED": "1"}
+    env = {**os.environ, "PYTHONPATH": str(CODE), "VV_DATA_DIR": str(DATA), "VV_DEVICE": "cuda", "COQUI_TOS_AGREED": "1",
+           "CUDA_VISIBLE_DEVICES": "0"}  # the trainer refuses to start when Kaggle shows two GPUs
     steps = [["fetch"], ["ingest"], ["prepare"], ["verify"], ["manifests"], ["audit"], ["references"]]
     for step, *arguments in steps:
         result = run(step, [sys.executable, "-m", "valorant_voice", step, *arguments], cwd=CODE, env=env)
