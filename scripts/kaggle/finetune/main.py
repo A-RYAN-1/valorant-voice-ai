@@ -22,10 +22,11 @@ OUT = Path("/kaggle/working")
 CODE = TMP / "repo"
 DATA = TMP / "data"
 DEPENDENCIES = ["soundfile", "scipy", "faster-whisper", "huggingface_hub", "pyarrow", "speechbrain", "coqui-tts[codec]>=0.27"]
-LINES_PER_AGENT = "5"
+LINES_PER_AGENT = "10"  # more than any agent has: every held-out test line is used
 CHECKPOINTS = TMP / "checkpoints"
-# (label, epochs, learning rate): the first run used 6 epochs at 5e-6 and the second 2 epochs at 5e-6
-EXPERIMENTS = [("lr1e-6-3ep", 3, "1e-6"), ("lr2e-6-3ep", 3, "2e-6"), ("lr1e-6-2ep", 2, "1e-6")]
+# (label, epochs, learning rate, agents): agents "" trains on every agent; earlier runs: 6 epochs at 5e-6, 2 epochs at 5e-6,
+# then lr 1e-6 x 3, 2e-6 x 3 and 1e-6 x 2 (none beat zero-shot)
+EXPERIMENTS = [("lr2e-6-3ep-control", 3, "2e-6", ""), ("sage-lr2e-6-3ep", 3, "2e-6", "sage"), ("sage-lr5e-6-6ep", 6, "5e-6", "sage")]
 
 log = []
 
@@ -60,16 +61,21 @@ def main():
         if step == "audit":
             (OUT / "audit.md").write_text(result.stdout, encoding="utf-8")
     else:
-        for label, epochs, rate in EXPERIMENTS:
+        # the baseline on the same, larger test set, so every experiment below is compared with it line for line
+        run("evaluate zero-shot", [sys.executable, "-m", "valorant_voice", "evaluate", "--lines", LINES_PER_AGENT,
+                                   "--label", "xtts-v2-zero-shot-all-test-lines"], cwd=CODE, env=env)
+        collect()
+        for label, epochs, rate, agents in EXPERIMENTS:
             shutil.rmtree(CHECKPOINTS, ignore_errors=True)
             arguments = ["--epochs", str(epochs), "--batch-size", "3", "--grad-accum", "5", "--lr", rate,
                          "--output", str(CHECKPOINTS)]
-            train = run(f"finetune {label}", [sys.executable, "-m", "valorant_voice.train.finetune", *arguments],
+            scope = ["--agents", agents] if agents else []
+            train = run(f"finetune {label}", [sys.executable, "-m", "valorant_voice.train.finetune", *arguments, *scope],
                         cwd=CODE, env=env, keep=6000)
             if train.returncode == 0:
                 tuned = {**env, "VV_CHECKPOINT_DIR": str(CHECKPOINTS / "model")}
                 run(f"evaluate {label}", [sys.executable, "-m", "valorant_voice", "evaluate", "--lines", LINES_PER_AGENT,
-                                          "--label", f"xtts-v2-pooled-{label}"], cwd=CODE, env=tuned)
+                                          "--label", f"xtts-v2-{label}", *scope], cwd=CODE, env=tuned)
             collect()
     stats = OUT / "stats"
     stats.mkdir(exist_ok=True)

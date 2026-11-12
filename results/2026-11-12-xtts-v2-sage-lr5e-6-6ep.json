@@ -1,0 +1,19 @@
+{
+  "date": "2026-11-12",
+  "label": "xtts-v2-sage-lr5e-6-6ep",
+  "checkpoint": "/kaggle/tmp/checkpoints/model",
+  "manifest_sha1": "f0bc66eaca756b4e2d9c609c0a00b28229781015",
+  "agents": {
+    "sage": {
+      "lines": 5,
+      "speaker_similarity": 0.3981,
+      "word_error_rate": 0.0667,
+      "real_time_factor": 0.447
+    }
+  },
+  "mean": {
+    "speaker_similarity": 0.3981,
+    "word_error_rate": 0.0667,
+    "real_time_factor": 0.447
+  }
+}

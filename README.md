@@ -15,7 +15,7 @@
   <a href="#status-and-roadmap">Roadmap</a>
 </p>
 
-<p align="center"><sub>Last updated: 2026-10-21 &middot; Runs locally only; not deployed yet</sub></p>
+<p align="center"><sub>Last updated: 2026-11-12 &middot; Runs locally only; not deployed yet</sub></p>
 
 ---
 
@@ -112,7 +112,19 @@ without the fine-tune.
 | Pooled, 3 epochs, lr 2e-6 | 0.405 | 0.092 | 0.51 |
 | Pooled, 2 epochs, lr 1e-6 | 0.400 | 0.097 | 0.51 |
 
-Similarity rose on 14 of 26 agents (+0.026 overall) but word error rate got worse on 16 of 26 (0.073 to 0.111), so this run does not beat the baseline on the agreed rule (similarity up, error rate not worse). The per-agent test sets hold only 2 to 5 lines, so single-agent differences are noise. The 2-epoch run (same day, `results/2026-11-06-xtts-v2-pooled-finetune-2-epochs.json`) moves less: similarity +0.007, word error rate +0.011, so more training trades accuracy for similarity and neither run beats the baseline. A sweep of three lower-learning-rate runs (same day, one Kaggle session) gives similarity 0.400 to 0.405, no gain over 0.401, and word error rate 0.092 to 0.127, all above the baseline 0.073. Five pooled fine-tunes in total, none better than zero-shot cloning on these 117 lines; word error rate moves by 0.03 between runs with the same data, so differences of that size are noise at this test-set size. Next: a Sage-only fine-tune and a larger test set.
+Similarity rose on 14 of 26 agents (+0.026 overall) but word error rate got worse on 16 of 26 (0.073 to 0.111), so this run does not beat the baseline on the agreed rule (similarity up, error rate not worse). The per-agent test sets hold only 2 to 5 lines, so single-agent differences are noise. The 2-epoch run (same day, `results/2026-11-06-xtts-v2-pooled-finetune-2-epochs.json`) moves less: similarity +0.007, word error rate +0.011, so more training trades accuracy for similarity and neither run beats the baseline. A sweep of three lower-learning-rate runs (same day, one Kaggle session) gives similarity 0.400 to 0.405, no gain over 0.401, and word error rate 0.092 to 0.127, all above the baseline 0.073. Five pooled fine-tunes in total, none better than zero-shot cloning on these 117 lines; word error rate moves by 0.03 between runs with the same data, so differences of that size are noise at this test-set size. Next: a Sage-only fine-tune and a larger test set (done 2026-11-12, below).
+
+**Sage-only fine-tune and a larger test set (measured 2026-11-12, one Kaggle session, `results/2026-11-12-*.json`):** the baseline was re-measured on every held-out test line (140 lines, 26 agents), and each run is compared with it on the same lines.
+
+| Model | Lines | Speaker similarity (higher) | Word error rate (lower) |
+|---|---|---|---|
+| Zero-shot XTTS-v2, all agents | 140 | 0.399 | 0.076 |
+| Pooled, 3 epochs, lr 2e-6 (control) | 140 | 0.406 | 0.092 |
+| Zero-shot XTTS-v2, Sage | 5 | 0.385 | 0.033 |
+| Sage only, 3 epochs, lr 2e-6 | 5 | 0.413 | 0.067 |
+| Sage only, 6 epochs, lr 5e-6 | 5 | 0.398 | 0.067 |
+
+On 140 lines the pooled control gains 0.008 similarity and loses 0.016 word error rate, so it still does not beat zero-shot. Sage-only at lr 2e-6 gains 0.028 similarity on Sage's 5 test lines, with word error rate rising from 0.033 to 0.067 (one more wrong word in a handful of lines), so this is also not a win on the agreed rule. Sage has only 5 held-out lines, so single-agent differences stay within noise. Eight fine-tunes in total, none better than zero-shot cloning; the measured negative result and the evaluation harness are what this project shows.
 
 ## Legal and ethics
 
