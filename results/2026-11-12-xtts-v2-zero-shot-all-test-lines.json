@@ -1,0 +1,169 @@
+{
+  "date": "2026-11-12",
+  "label": "xtts-v2-zero-shot-all-test-lines",
+  "checkpoint": "base xtts_v2",
+  "manifest_sha1": "f0bc66eaca756b4e2d9c609c0a00b28229781015",
+  "agents": {
+    "astra": {
+      "lines": 4,
+      "speaker_similarity": 0.2887,
+      "word_error_rate": 0.3409,
+      "real_time_factor": 0.439
+    },
+    "breach": {
+      "lines": 3,
+      "speaker_similarity": 0.3405,
+      "word_error_rate": 0.1111,
+      "real_time_factor": 0.455
+    },
+    "brimstone": {
+      "lines": 3,
+      "speaker_similarity": 0.5252,
+      "word_error_rate": 0.1714,
+      "real_time_factor": 0.452
+    },
+    "chamber": {
+      "lines": 6,
+      "speaker_similarity": 0.48,
+      "word_error_rate": 0.0167,
+      "real_time_factor": 0.442
+    },
+    "clove": {
+      "lines": 8,
+      "speaker_similarity": 0.4041,
+      "word_error_rate": 0.0441,
+      "real_time_factor": 0.443
+    },
+    "cypher": {
+      "lines": 8,
+      "speaker_similarity": 0.4581,
+      "word_error_rate": 0.0304,
+      "real_time_factor": 0.451
+    },
+    "deadlock": {
+      "lines": 6,
+      "speaker_similarity": 0.3853,
+      "word_error_rate": 0.037,
+      "real_time_factor": 0.45
+    },
+    "fade": {
+      "lines": 5,
+      "speaker_similarity": 0.2674,
+      "word_error_rate": 0.0,
+      "real_time_factor": 0.466
+    },
+    "gekko": {
+      "lines": 4,
+      "speaker_similarity": 0.2584,
+      "word_error_rate": 0.1042,
+      "real_time_factor": 0.448
+    },
+    "harbor": {
+      "lines": 5,
+      "speaker_similarity": 0.3234,
+      "word_error_rate": 0.0571,
+      "real_time_factor": 0.455
+    },
+    "iso": {
+      "lines": 3,
+      "speaker_similarity": 0.5536,
+      "word_error_rate": 0.0,
+      "real_time_factor": 0.442
+    },
+    "jett": {
+      "lines": 5,
+      "speaker_similarity": 0.3436,
+      "word_error_rate": 0.1331,
+      "real_time_factor": 0.441
+    },
+    "kayo": {
+      "lines": 8,
+      "speaker_similarity": 0.489,
+      "word_error_rate": 0.101,
+      "real_time_factor": 0.437
+    },
+    "killjoy": {
+      "lines": 6,
+      "speaker_similarity": 0.4451,
+      "word_error_rate": 0.0436,
+      "real_time_factor": 0.445
+    },
+    "neon": {
+      "lines": 5,
+      "speaker_similarity": 0.422,
+      "word_error_rate": 0.1819,
+      "real_time_factor": 0.445
+    },
+    "omen": {
+      "lines": 7,
+      "speaker_similarity": 0.422,
+      "word_error_rate": 0.013,
+      "real_time_factor": 0.448
+    },
+    "phoenix": {
+      "lines": 6,
+      "speaker_similarity": 0.262,
+      "word_error_rate": 0.0831,
+      "real_time_factor": 0.433
+    },
+    "raze": {
+      "lines": 5,
+      "speaker_similarity": 0.3914,
+      "word_error_rate": 0.0978,
+      "real_time_factor": 0.437
+    },
+    "reyna": {
+      "lines": 4,
+      "speaker_similarity": 0.5268,
+      "word_error_rate": 0.0417,
+      "real_time_factor": 0.447
+    },
+    "sage": {
+      "lines": 5,
+      "speaker_similarity": 0.3853,
+      "word_error_rate": 0.0333,
+      "real_time_factor": 0.443
+    },
+    "skye": {
+      "lines": 5,
+      "speaker_similarity": 0.39,
+      "word_error_rate": 0.0,
+      "real_time_factor": 0.44
+    },
+    "sova": {
+      "lines": 7,
+      "speaker_similarity": 0.3043,
+      "word_error_rate": 0.0399,
+      "real_time_factor": 0.438
+    },
+    "tejo": {
+      "lines": 4,
+      "speaker_similarity": 0.4333,
+      "word_error_rate": 0.233,
+      "real_time_factor": 0.451
+    },
+    "viper": {
+      "lines": 2,
+      "speaker_similarity": 0.3154,
+      "word_error_rate": 0.0455,
+      "real_time_factor": 0.457
+    },
+    "vyse": {
+      "lines": 9,
+      "speaker_similarity": 0.4727,
+      "word_error_rate": 0.0218,
+      "real_time_factor": 0.439
+    },
+    "yoru": {
+      "lines": 7,
+      "speaker_similarity": 0.4753,
+      "word_error_rate": 0.0,
+      "real_time_factor": 0.442
+    }
+  },
+  "mean": {
+    "speaker_similarity": 0.3986,
+    "word_error_rate": 0.0762,
+    "real_time_factor": 0.4456
+  }
+}
