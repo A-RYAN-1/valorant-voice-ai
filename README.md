@@ -15,9 +15,12 @@
   <a href="#status-and-roadmap">Roadmap</a>
 </p>
 
-<p align="center"><sub>Last updated: 2026-11-12 &middot; Runs locally only; not deployed yet</sub></p>
+<p align="center"><sub>Last updated: 2026-11-16 &middot; Runs locally only; not deployed yet</sub></p>
 
 ---
+
+<p align="center"><img src="docs/images/agent-picker.png" alt="The web page with Astra selected and her measured speaker similarity and word error rate under the picker" width="720"></p>
+<p align="center"><sub>The page with a stand-in engine that returns silence: no game audio is used in this picture.</sub></p>
 
 ## Contents
 
@@ -62,6 +65,11 @@ machine with audio you extracted from your own copy of the game.
 - **Leak-free split**: a line's train, validation or test assignment is a hash of its text, so test lines
   are never trained on, a repeated line such as "Okay." never sits in both train and test, and nothing
   moves when more data is added.
+- **Every agent with data, by measurement**: 26 agents are served by zero-shot cloning, because none of
+  eight fine-tunes beat it. `GET /v1/agents` returns each agent's measured speaker similarity and word
+  error rate, and the page lists only agents that have voice data and a measured result. Miks, Veto and
+  Waylay stay unlisted: the public dataset has no lines for them. Table:
+  [docs/per-agent-results.md](docs/per-agent-results.md).
 - **API**: typed JSON request, text length cap, per-client rate limit, every response labelled
   `X-Generated-Audio: ai`.
 - **Evaluation harness**: speaker similarity (ECAPA-TDNN cosine), word error rate (Whisper hears the
@@ -194,6 +202,7 @@ All optional; the defaults work from a fresh clone. The full list with comments 
 | `VV_DATA_DIR`, `VV_MODEL_DIR`, `VV_OUTPUT_DIR` | next to the code | local-only folders for audio, weights, output |
 | `VV_CHECKPOINT_DIR` | empty | fine-tuned checkpoint folder; empty uses the base model |
 | `VV_DEVICE` | empty | `cuda` or `cpu`; empty picks cuda when available |
+| `VV_QUALITY_FILE` | the 2026-11-12 zero-shot result in `results/` | result file whose per-agent numbers `/v1/agents` and the page show |
 | `VV_MAX_CHARS` | 300 | longest text the API accepts |
 | `VV_RATE_LIMIT_PER_MINUTE` | 20 | requests per client per minute |
 | `VV_SPLIT_SEED` | 13 | seed of the train, val and test split |
@@ -215,8 +224,9 @@ computes the voice conditioning in about 28 s, a 2.4 s line is generated in 0.9 
 using 1.8 GB of GPU memory.
 
 - [x] Runnable package on Python 3.12 with tests
-- [ ] Baseline numbers: zero-shot XTTS-v2 on the held-out lines of every agent
-- [ ] Fine-tune on all agents and the results table, baseline against fine-tuned
+- [x] Baseline numbers: zero-shot XTTS-v2 on the held-out lines of every agent
+- [x] Fine-tune comparison: eight runs, none beats zero-shot (see Results so far)
+- [x] Every agent with data served and measured (2026-11-16)
 - [ ] Inaudible watermark on generated audio
 - [ ] CI (lint and the unit tests), Dockerfile for the API
 
