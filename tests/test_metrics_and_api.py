@@ -1,4 +1,5 @@
 import io
+import json
 
 import numpy as np
 import pytest
@@ -8,6 +9,7 @@ from fastapi.testclient import TestClient
 from valorant_voice import agents, config
 from valorant_voice.data.transcribe import accept, normalise_text
 from valorant_voice.evaluation import metrics
+from valorant_voice.evaluation.report import agent_table, load_quality
 from valorant_voice.serve.api import RateLimiter, create_app
 
 
@@ -90,3 +92,35 @@ def test_rate_limiter_blocks_after_the_limit():
 
 def test_index_page_is_served(client):
     assert "Valorant Voice AI" in client.get("/").text
+
+
+def _entry(similarity, lines=5):
+    return {"lines": lines, "speaker_similarity": similarity, "word_error_rate": 0.1, "real_time_factor": 0.5}
+
+
+def test_agents_carry_measured_quality_for_measured_agents():
+    app = create_app(FakeEngine(), quality={"sage": _entry(0.4)})
+    body = {entry["id"]: entry for entry in TestClient(app).get("/v1/agents").json()}
+    assert body["sage"]["quality"]["speaker_similarity"] == 0.4
+    assert body["sage"]["strategy"] == "zero-shot"
+    assert body["jett"]["quality"] is None
+
+
+def test_load_quality_flags_thin_test_sets_and_skips_unknown_agents(tmp_path):
+    path = tmp_path / "result.json"
+    agents_block = {"sage": _entry(0.4, lines=4), "jett": _entry(0.4, lines=6), "nobody": _entry(0.4, lines=9)}
+    path.write_text(json.dumps({"agents": agents_block}))
+    quality = load_quality(path)
+    assert set(quality) == {"sage", "jett"}
+    assert quality["sage"]["thin_test_set"] is True
+    assert quality["jett"]["thin_test_set"] is False
+    assert load_quality(tmp_path / "missing.json") == {}
+
+
+def test_agent_table_lists_lowest_first_and_totals(tmp_path):
+    path = tmp_path / "result.json"
+    mean = {"speaker_similarity": 0.4, "word_error_rate": 0.1, "real_time_factor": 0.5}
+    path.write_text(json.dumps({"agents": {"sage": _entry(0.5), "jett": _entry(0.3)}, "mean": mean}))
+    rows = agent_table(path).splitlines()
+    assert rows[2].startswith("| Jett") and rows[3].startswith("| Sage")
+    assert rows[-1].startswith("| **all 2** | 10 |")

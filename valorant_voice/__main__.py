@@ -99,6 +99,12 @@ def _evaluate(args):
                          agents=args.agents.split(",") if args.agents else None))
 
 
+def _agent_table(_args):
+    from .evaluation.report import agent_table
+
+    print(agent_table())
+
+
 def _serve(args):
     import uvicorn
 
@@ -138,6 +144,7 @@ def main(argv=None):
     evaluate.add_argument("--lines", type=int, default=10)
     evaluate.add_argument("--agents", help="comma-separated agent ids to measure; default is every agent")
     evaluate.add_argument("--label", default="", help="name in the result file; default is the checkpoint folder")
+    add("agent-table", _agent_table, "print the per-agent measured table (markdown) from the zero-shot result file")
     serve = add("serve", _serve, "run the API and the web page")
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8000)

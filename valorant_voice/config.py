@@ -23,6 +23,11 @@ REFERENCE_DIR = DATA_DIR / "reference"
 # Fine-tuned checkpoint folder (config.json, model.pth, vocab.json); empty means the base XTTS-v2.
 CHECKPOINT_DIR = os.environ.get("VV_CHECKPOINT_DIR", "")
 
+# Result file whose per-agent numbers are shown next to each agent: zero-shot on every held-out test line.
+QUALITY_FILE = os.environ.get(
+    "VV_QUALITY_FILE", str(ROOT / "results" / "2026-11-12-xtts-v2-zero-shot-all-test-lines.json")
+)
+
 DEVICE = os.environ.get("VV_DEVICE", "")  # "" picks cuda when available, otherwise cpu
 
 # Request limits for the API.

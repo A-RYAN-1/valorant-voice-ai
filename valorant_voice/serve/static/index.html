@@ -32,6 +32,7 @@
     audio { width: 100%; margin-top: 4px; }
     #message { min-height: 22px; font-size: 14px; color: var(--muted); }
     #message.error { color: var(--danger); }
+    #quality { margin: 0; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
     footer { margin-top: 20px; font-size: 13px; color: var(--muted); }
   </style>
 </head>
@@ -44,6 +45,7 @@
       <label>Agent
         <select id="agent" required></select>
       </label>
+      <p id="quality" aria-live="polite"></p>
       <label>Text
         <textarea id="text" maxlength="300" required placeholder="Rotate B, I will hold the smoke."></textarea>
       </label>
@@ -72,17 +74,26 @@
       message.className = isError ? "error" : "";
     };
 
+    const quality = document.getElementById("quality");
+    const measured = {};
+    const showQuality = () => {
+      const q = measured[agent.value];
+      quality.textContent = q
+        ? `Zero-shot clone. Measured on ${q.lines} held-out lines${q.thin_test_set ? " (few, so noisy)" : ""}: ` +
+          `speaker similarity ${q.speaker_similarity.toFixed(2)}, word error rate ${q.word_error_rate.toFixed(2)}.`
+        : "";
+    };
+    agent.addEventListener("change", showQuality);
+
     fetch("/v1/agents")
       .then((response) => response.json())
       .then((agents) => {
-        for (const entry of agents) {
-          const option = new Option(entry.ready ? entry.name : `${entry.name} (no voice data)`, entry.id);
-          option.disabled = !entry.ready;
-          agent.add(option);
+        for (const entry of agents.filter((a) => a.ready && a.quality)) {
+          measured[entry.id] = entry.quality;
+          agent.add(new Option(entry.name, entry.id));
         }
-        const first = [...agent.options].find((option) => !option.disabled);
-        if (first) agent.value = first.value;
-        else say("No agent has voice data loaded yet. See the README, Data.", true);
+        if (agent.options.length) showQuality();
+        else say("No agent has voice data and a measured result yet. See the README, Data.", true);
       })
       .catch(() => say("Cannot reach the server.", true));
 

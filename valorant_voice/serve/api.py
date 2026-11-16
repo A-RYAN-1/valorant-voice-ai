@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 
 from .. import config
 from ..agents import AGENTS
+from ..evaluation.report import load_quality
 
 STATIC_DIR = Path(__file__).parent / "static"
 
@@ -47,13 +48,14 @@ class RateLimiter:
         return True
 
 
-def create_app(engine: Engine) -> FastAPI:
+def create_app(engine: Engine, quality: dict[str, dict] | None = None) -> FastAPI:
     app = FastAPI(
         title="Valorant Voice AI",
         description="Unofficial, non-commercial fan project. Not affiliated with Riot Games.",
         version="0.1.0",
     )
     limiter = RateLimiter(config.RATE_LIMIT_PER_MINUTE)
+    measured = load_quality() if quality is None else quality
 
     @app.get("/health")
     def health():
@@ -62,7 +64,10 @@ def create_app(engine: Engine) -> FastAPI:
     @app.get("/v1/agents")
     def agents():
         ready = set(engine.available_agents())
-        return [{"id": slug, "name": name, "ready": slug in ready} for slug, name in AGENTS.items()]
+        return [
+            {"id": slug, "name": name, "ready": slug in ready, "strategy": "zero-shot", "quality": measured.get(slug)}
+            for slug, name in AGENTS.items()
+        ]
 
     @app.post("/v1/speak", response_class=Response, responses={200: {"content": {"audio/wav": {}}}})
     def speak(body: SpeakRequest, request: Request):
