@@ -1,13 +1,12 @@
 """The HTTP API: list agents, turn text into speech as an agent."""
 
-import io
+import asyncio
 import time
 from collections import defaultdict, deque
 from pathlib import Path
 from typing import Protocol
 
 import numpy as np
-import soundfile as sf
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, Field
@@ -15,6 +14,7 @@ from pydantic import BaseModel, Field
 from .. import config
 from ..agents import AGENTS
 from ..evaluation.report import load_quality
+from .guardrails import encode_wav, is_blocked
 
 STATIC_DIR = Path(__file__).parent / "static"
 
@@ -70,17 +70,22 @@ def create_app(engine: Engine, quality: dict[str, dict] | None = None) -> FastAP
         ]
 
     @app.post("/v1/speak", response_class=Response, responses={200: {"content": {"audio/wav": {}}}})
-    def speak(body: SpeakRequest, request: Request):
+    async def speak(body: SpeakRequest, request: Request):
         if body.agent not in AGENTS:
             raise HTTPException(status_code=404, detail=f"Unknown agent '{body.agent}'")
         if body.agent not in engine.available_agents():
             raise HTTPException(status_code=409, detail=f"No voice data is loaded for {AGENTS[body.agent]}")
         if not limiter.allow(request.client.host if request.client else "unknown"):
             raise HTTPException(status_code=429, detail="Too many requests, try again in a minute")
-        samples, rate = engine.synthesize(body.agent, body.text)
-        buffer = io.BytesIO()
-        sf.write(buffer, samples, rate, format="WAV", subtype="PCM_16")
-        return Response(buffer.getvalue(), media_type="audio/wav", headers={"X-Generated-Audio": "ai"})
+        if is_blocked(body.text):
+            raise HTTPException(status_code=422, detail="This text is not allowed")
+        try:
+            samples, rate = await asyncio.wait_for(
+                asyncio.to_thread(engine.synthesize, body.agent, body.text), config.REQUEST_TIMEOUT_SECONDS
+            )
+        except TimeoutError:
+            raise HTTPException(status_code=504, detail="Synthesis took too long, try a shorter text")
+        return Response(encode_wav(samples, rate), media_type="audio/wav", headers={"X-Generated-Audio": "ai"})
 
     @app.get("/", include_in_schema=False)
     def page():

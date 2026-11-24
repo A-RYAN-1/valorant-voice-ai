@@ -28,4 +28,4 @@ line-length = 110
 include = ["valorant_voice*"]
 
 [tool.setuptools.package-data]
-valorant_voice = ["serve/static/*"]
+valorant_voice = ["serve/static/*", "serve/blocklist.txt"]

@@ -15,7 +15,7 @@
   <a href="#status-and-roadmap">Roadmap</a>
 </p>
 
-<p align="center"><sub>Last updated: 2026-11-16 &middot; Runs locally only; not deployed yet</sub></p>
+<p align="center"><sub>Last updated: 2026-11-24 &middot; Runs locally only; not deployed yet</sub></p>
 
 ---
 
@@ -70,8 +70,15 @@ machine with audio you extracted from your own copy of the game.
   error rate, and the page lists only agents that have voice data and a measured result. Miks, Veto and
   Waylay stay unlisted: the public dataset has no lines for them. Table:
   [docs/per-agent-results.md](docs/per-agent-results.md).
-- **API**: typed JSON request, text length cap, per-client rate limit, every response labelled
-  `X-Generated-Audio: ai`.
+- **API**: typed JSON request, text length cap, per-client rate limit, a 60 second synthesis timeout
+  (504), every response labelled `X-Generated-Audio: ai`.
+- **Guardrails**: every WAV carries an inaudible keyed watermark (spread-spectrum noise 24 dB below the
+  local speech level) and an "AI generated" comment tag in the file; a phrase blocklist
+  ([`blocklist.txt`](valorant_voice/serve/blocklist.txt), threats and scam scripts) refuses text with
+  422. Measured on generated speech-like audio, 30 runs per length: the mark is found in 30 of 30 clips of
+  2 s or more, 29 of 30 at 1 s and 19 of 30 at 0.5 s; 200 unmarked clips per length scored at most z 3.0
+  against the threshold of 5. It survives the 16-bit WAV, not MP3 or resampling, and anyone with the key
+  can strip it, so it labels honest output and proves nothing against an adversary.
 - **Evaluation harness**: speaker similarity (ECAPA-TDNN cosine), word error rate (Whisper hears the
   output), and real-time factor, written with the checkpoint and manifest hash.
 
@@ -145,7 +152,7 @@ unofficial, non-commercial fan and learning project, not affiliated with Riot Ga
    the audio is Riot's, so a public copy is not permission: nothing here redistributes it.
 2. **No public demo.**
 3. **Fixed list of fictional characters.** Nothing accepts an uploaded voice.
-4. **Output is labelled** with the `X-Generated-Audio: ai` header and a footer on the page.
+4. **Output is labelled** with the `X-Generated-Audio: ai` header, a watermark and an in-file tag, and a footer on the page.
 5. **Model licence:** XTTS-v2 is released under the Coqui Public Model License, which is non-commercial.
    Using it for this project is within that licence; selling anything built on it is not.
 
@@ -205,6 +212,9 @@ All optional; the defaults work from a fresh clone. The full list with comments 
 | `VV_QUALITY_FILE` | the 2026-11-12 zero-shot result in `results/` | result file whose per-agent numbers `/v1/agents` and the page show |
 | `VV_MAX_CHARS` | 300 | longest text the API accepts |
 | `VV_RATE_LIMIT_PER_MINUTE` | 20 | requests per client per minute |
+| `VV_REQUEST_TIMEOUT_SECONDS` | 60 | longest a synthesis may take before the API answers 504 |
+| `VV_BLOCKLIST_FILE` | the shipped list | file of blocked phrases, one per line |
+| `VV_WATERMARK_KEY` | a public default | key of the watermark sequence; set your own to make it yours |
 | `VV_SPLIT_SEED` | 13 | seed of the train, val and test split |
 
 ## Deployment
@@ -227,7 +237,7 @@ using 1.8 GB of GPU memory.
 - [x] Baseline numbers: zero-shot XTTS-v2 on the held-out lines of every agent
 - [x] Fine-tune comparison: eight runs, none beats zero-shot (see Results so far)
 - [x] Every agent with data served and measured (2026-11-16)
-- [ ] Inaudible watermark on generated audio
+- [x] Watermark, AI tag, blocklist and request timeout on the API (2026-11-24)
 - [ ] CI (lint and the unit tests), Dockerfile for the API
 
 ## Credits
