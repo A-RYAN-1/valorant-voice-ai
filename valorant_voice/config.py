@@ -33,6 +33,9 @@ DEVICE = os.environ.get("VV_DEVICE", "")  # "" picks cuda when available, otherw
 # Request limits for the API.
 MAX_CHARS = int(os.environ.get("VV_MAX_CHARS", "300"))
 RATE_LIMIT_PER_MINUTE = int(os.environ.get("VV_RATE_LIMIT_PER_MINUTE", "20"))
+REQUEST_TIMEOUT_SECONDS = float(os.environ.get("VV_REQUEST_TIMEOUT_SECONDS", "60"))
+BLOCKLIST_FILE = os.environ.get("VV_BLOCKLIST_FILE", "")  # empty uses the list shipped in serve/blocklist.txt
+WATERMARK_KEY = os.environ.get("VV_WATERMARK_KEY") or "valorant-voice-ai"
 
 # Dataset rules.
 SAMPLE_RATE = 22050  # the rate XTTS-v2 expects for training audio

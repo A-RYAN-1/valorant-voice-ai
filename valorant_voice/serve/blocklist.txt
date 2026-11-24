@@ -1,0 +1,18 @@
+# One phrase per line, matched as whole words after lowercasing and dropping punctuation.
+# Aimed at the two ways a cloned character voice does harm: threats and scam or phishing scripts.
+# Extend it with VV_BLOCKLIST_FILE.
+kill yourself
+i will kill you
+i am going to kill you
+bomb threat
+there is a bomb
+send me your password
+your account has been compromised
+verify your account
+one time password
+otp
+credit card number
+card number and cvv
+social security number
+wire transfer
+gift card
